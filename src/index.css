@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(215 28% 17%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(215 28% 17%);
+  --color-muted: hsl(210 40% 96%);
+  --color-muted-foreground: hsl(215 16% 47%);
+  --color-primary: hsl(0 84% 60%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-accent: hsl(210 40% 96%);
+  --color-accent-foreground: hsl(215 28% 17%);
+  --color-border: hsl(214 20% 91%);
+  --color-input: hsl(214 20% 91%);
+  --color-ring: hsl(0 84% 60%);
+
+  /* Sidebar */
+  --color-sidebar: hsl(215 25% 15%);
+  --color-sidebar-foreground: hsl(210 20% 96%);
+  --color-sidebar-primary: hsl(0 84% 60%);
+  --color-sidebar-primary-foreground: hsl(0 0% 100%);
+  --color-sidebar-accent: hsl(215 20% 20%);
+  --color-sidebar-accent-foreground: hsl(210 20% 96%);
+  --color-sidebar-border: hsl(215 20% 25%);
+  --color-sidebar-ring: hsl(0 84% 60%);
+
+  /* Safety Semantic Colors */
+  --color-risk-red-bg: hsl(0 84% 95%);
+  --color-risk-red-text: hsl(0 84% 45%);
+  --color-risk-orange-bg: 25 90% 95%);
+  --color-risk-orange-text: 25 90% 45%);
+  --color-risk-yellow-bg: 45 90% 95%);
+  --color-risk-yellow-text: 45 90% 45%);
+  --color-risk-blue-bg: 210 90% 95%);
+  --color-risk-blue-text: 210 90% 45%);
+  --color-success-bg: 142 70% 95%);
+  --color-success-text: 142 70% 40%);
+
+  --radius-md: 6px;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  .safety-card {
+    @apply bg-card rounded-md border border-border shadow-sm overflow-hidden relative;
+  }
+  
+  .safety-bar-red { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-red-text; }
+  .safety-bar-orange { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-orange-text; }
+  .safety-bar-yellow { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-yellow-text; }
+  .safety-bar-blue { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-blue-text; }
+  .safety-bar-green { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-success-text; }
+}
