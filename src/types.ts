@@ -1,30 +1,23 @@
-export type RiskLevel = 'RED' | 'ORANGE' | 'YELLOW' | 'BLUE';
-export type HazardStatus = 'PENDING' | 'RECTIFYING' | 'REVIEWING' | 'CLOSED';
-
-export interface KPI {
-  label: string;
-  value: number | string;
-  trend: number;
-  unit?: string;
-  level?: RiskLevel | 'SUCCESS';
+export interface MaterialStats {
+  trains: number;
+  wagons?: number; 
+  tonnage: number;
 }
 
-export interface Hazard {
-  id: string;
-  title: string;
-  description: string;
-  level: RiskLevel;
-  status: HazardStatus;
-  reporter: string;
+export interface DailyRecord {
   date: string;
-  location: string;
+  coalInbound: MaterialStats;
+  bauxiteInbound: MaterialStats;
+  coalOutbound: number; // tonnage
+  bauxiteOutbound: number; // tonnage
+  coalInventory: number; // tonnage
+  bauxiteInventory: number; // tonnage
 }
 
-export interface RiskPoint {
-  id: string;
-  name: string;
-  level: RiskLevel;
-  department: string;
-  lastInspection: string;
-  status: 'NORMAL' | 'ABNORMAL';
+export interface SummaryStats {
+  label: string;
+  value: string | number;
+  unit: string;
+  trend?: number;
+  type: 'coal' | 'bauxite' | 'total';
 }

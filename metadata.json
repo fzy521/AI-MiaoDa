@@ -1,5 +1,5 @@
 {
-  "name": "RailSafe Industrial",
-  "description": "Industrial safety management SaaS for railway special lines, focusing on risk monitoring and hazard closed-loop control.",
+  "name": "煤炭与铝矾土物流统计报表",
+  "description": "煤炭与铝矾土每日进出库及库存统计分析报表系统，包含列数、车数、吨数及库存余量监控。",
   "requestFramePermissions": []
 }
