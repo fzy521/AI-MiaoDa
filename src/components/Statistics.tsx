@@ -31,7 +31,8 @@ import {
   Eye,
   X
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const inventoryData = [
   { name: '煤炭 (东区)', value: 12500, color: '#1a73e8' },
@@ -65,10 +66,9 @@ export function Statistics() {
 
   const handleExport = (reportName: string) => {
     setIsExporting(true);
-    // Simulate export
     setTimeout(() => {
       setIsExporting(false);
-      alert(`${reportName} 导出成功！`);
+      toast(`${reportName} 导出成功！`);
     }, 1500);
   };
 
@@ -99,7 +99,7 @@ export function Statistics() {
             <div className="p-2 bg-blue-50 text-primary rounded-lg">
               <Package size={24} />
             </div>
-            <span className="flex items-center text-xs font-medium text-success-text bg-success-bg px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
               <ArrowUpRight size={14} className="mr-1" />
               +5.2%
             </span>
@@ -113,10 +113,10 @@ export function Statistics() {
 
         <div className="safety-card p-6">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-green-50 text-success-text rounded-lg">
+            <div className="p-2 bg-green-50 text-green-600 rounded-lg">
               <Truck size={24} />
             </div>
-            <span className="flex items-center text-xs font-medium text-success-text bg-success-bg px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
               <ArrowUpRight size={14} className="mr-1" />
               +12.8%
             </span>
@@ -130,10 +130,10 @@ export function Statistics() {
 
         <div className="safety-card p-6">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-orange-50 text-risk-orange-text rounded-lg">
+            <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
               <Ship size={24} />
             </div>
-            <span className="flex items-center text-xs font-medium text-risk-red-text bg-risk-red-bg px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
               <ArrowDownRight size={14} className="mr-1" />
               -2.4%
             </span>
@@ -297,7 +297,6 @@ export function Statistics() {
                 <X size={24} />
               </button>
             </div>
-            
             <div className="flex-1 overflow-auto p-6">
               <div className="space-y-8">
                 {/* Mock Report Content */}
@@ -350,7 +349,7 @@ export function Statistics() {
 
                       {/* Bauxite Logistics Card */}
                       <div className="p-6 bg-green-50/50 rounded-2xl border border-green-100">
-                        <h4 className="text-sm font-bold text-success-text uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-green-600 uppercase tracking-wider mb-4 flex items-center gap-2">
                           <Ship size={16} />
                           铝矾土物流统计概况 (2026-03-30)
                         </h4>
@@ -388,7 +387,7 @@ export function Statistics() {
                         </div>
                         <div className="mt-4 pt-4 border-t border-green-100 flex justify-between items-center">
                           <span className="text-xs text-muted-foreground">当前库存</span>
-                          <span className="text-lg font-bold text-success-text">26,200 t</span>
+                          <span className="text-lg font-bold text-green-600">26,200 t</span>
                         </div>
                       </div>
                     </div>
@@ -416,7 +415,7 @@ export function Statistics() {
                               <td className="px-4 py-3">
                                 <span className={cn(
                                   "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                  row.cargo === '煤炭' ? "bg-blue-50 text-primary" : "bg-green-50 text-success-text"
+                                  row.cargo === '煤炭' ? "bg-blue-50 text-primary" : "bg-green-50 text-green-600"
                                 )}>
                                   {row.cargo}
                                 </span>
@@ -424,7 +423,7 @@ export function Statistics() {
                               <td className="px-4 py-3">
                                 <span className={cn(
                                   "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                  row.type === '入库' ? "bg-muted text-muted-foreground" : "bg-orange-50 text-risk-orange-text"
+                                  row.type === '入库' ? "bg-muted text-muted-foreground" : "bg-orange-50 text-orange-600"
                                 )}>
                                   {row.type}
                                 </span>
@@ -439,328 +438,14 @@ export function Statistics() {
                       </table>
                     </div>
                   </div>
-                ) : viewingReport === '客户存货明细汇总' ? (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">总客户数</p>
-                        <p className="text-xl font-bold mt-1">48 家</p>
-                      </div>
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">客户总存量</p>
-                        <p className="text-xl font-bold mt-1">65,900 t</p>
-                      </div>
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">活跃度最高</p>
-                        <p className="text-xl font-bold mt-1">华能电力</p>
-                      </div>
-                    </div>
-
-                    <div className="border border-border rounded-xl overflow-hidden">
-                      <table className="w-full text-sm text-left">
-                        <thead className="bg-muted">
-                          <tr>
-                            <th className="px-4 py-3 font-medium">客户名称</th>
-                            <th className="px-4 py-3 font-medium">货物品类</th>
-                            <th className="px-4 py-3 font-medium text-right">期初库存 (t)</th>
-                            <th className="px-4 py-3 font-medium text-right">本期入库 (t)</th>
-                            <th className="px-4 py-3 font-medium text-right">本期出库 (t)</th>
-                            <th className="px-4 py-3 font-medium text-right">期末库存 (t)</th>
-                            <th className="px-4 py-3 font-medium">最后更新</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {[
-                            { customer: '华能电力', cargo: '煤炭', initial: '15,000', inbound: '5,000', outbound: '3,200', current: '16,800', lastUpdate: '2026-03-30 10:00' },
-                            { customer: '中铝集团', cargo: '铝矾土', initial: '12,000', inbound: '8,000', outbound: '4,500', current: '15,500', lastUpdate: '2026-03-30 09:30' },
-                            { customer: '大唐发电', cargo: '煤炭', initial: '8,500', inbound: '2,400', outbound: '1,800', current: '9,100', lastUpdate: '2026-03-29 14:30' },
-                            { customer: '魏桥铝业', cargo: '铝矾土', initial: '14,200', inbound: '6,500', outbound: '5,200', current: '15,500', lastUpdate: '2026-03-29 11:20' },
-                            { customer: '国电投', cargo: '煤炭', initial: '10,000', inbound: '3,000', outbound: '4,000', current: '9,000', lastUpdate: '2026-03-30 08:15' },
-                          ].map((row, i) => (
-                            <tr key={i} className="hover:bg-muted/30">
-                              <td className="px-4 py-3 font-medium">{row.customer}</td>
-                              <td className="px-4 py-3">
-                                <span className={cn(
-                                  "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                  row.cargo === '煤炭' ? "bg-blue-50 text-primary" : "bg-green-50 text-success-text"
-                                )}>
-                                  {row.cargo}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 text-right font-mono">{row.initial}</td>
-                              <td className="px-4 py-3 text-right font-mono text-primary">+{row.inbound}</td>
-                              <td className="px-4 py-3 text-right font-mono text-risk-orange-text">-{row.outbound}</td>
-                              <td className="px-4 py-3 text-right font-bold font-mono">{row.current}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{row.lastUpdate}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ) : viewingReport === '集装箱库存和当日装卸情况' ? (
-                  <div className="space-y-6">
-                    {/* Container KPI Summary */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                            <Box size={20} />
-                          </div>
-                          <h4 className="text-sm font-bold text-indigo-900 uppercase tracking-wider">当日装卸动态</h4>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase">当日装船/车</p>
-                            <p className="text-xl font-bold text-indigo-700">124 <span className="text-xs font-normal">TEU</span></p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase">当日卸船/车</p>
-                            <p className="text-xl font-bold text-indigo-700">86 <span className="text-xs font-normal">TEU</span></p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-5 bg-slate-50/50 rounded-2xl border border-slate-200">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2 bg-slate-200 text-slate-600 rounded-lg">
-                            <LayoutGrid size={20} />
-                          </div>
-                          <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">场内库存分布</h4>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase">重箱 (Full)</p>
-                            <p className="text-xl font-bold text-slate-700">1,240 <span className="text-xs font-normal">TEU</span></p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase">空箱 (Empty)</p>
-                            <p className="text-xl font-bold text-slate-700">450 <span className="text-xs font-normal">TEU</span></p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-5 bg-amber-50/50 rounded-2xl border border-amber-100">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                            <ArrowRightLeft size={20} />
-                          </div>
-                          <h4 className="text-sm font-bold text-amber-900 uppercase tracking-wider">堆场利用率</h4>
-                        </div>
-                        <div className="flex items-end gap-2">
-                          <p className="text-3xl font-bold text-amber-700">74.2%</p>
-                          <div className="flex-1 h-2 bg-amber-100 rounded-full mb-2 overflow-hidden">
-                            <div className="h-full bg-amber-500 rounded-full" style={{ width: '74.2%' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Container Size Distribution */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-3 bg-white border border-border rounded-xl text-center">
-                        <p className="text-[10px] text-muted-foreground mb-1">20' 重箱</p>
-                        <p className="text-lg font-bold">420</p>
-                      </div>
-                      <div className="p-3 bg-white border border-border rounded-xl text-center">
-                        <p className="text-[10px] text-muted-foreground mb-1">40' 重箱</p>
-                        <p className="text-lg font-bold">410</p>
-                      </div>
-                      <div className="p-3 bg-white border border-border rounded-xl text-center">
-                        <p className="text-[10px] text-muted-foreground mb-1">20' 空箱</p>
-                        <p className="text-lg font-bold">180</p>
-                      </div>
-                      <div className="p-3 bg-white border border-border rounded-xl text-center">
-                        <p className="text-[10px] text-muted-foreground mb-1">40' 空箱</p>
-                        <p className="text-lg font-bold">135</p>
-                      </div>
-                    </div>
-
-                    {/* Daily Operations Table */}
-                    <div className="border border-border rounded-xl overflow-hidden">
-                      <div className="bg-muted px-4 py-2 border-b border-border flex justify-between items-center">
-                        <span className="text-xs font-bold uppercase tracking-wider">当日装卸作业明细 (2026-03-30)</span>
-                        <span className="text-[10px] text-muted-foreground">共 210 条记录</span>
-                      </div>
-                      <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50">
-                          <tr>
-                            <th className="px-4 py-3 font-medium">箱号</th>
-                            <th className="px-4 py-3 font-medium">尺寸/类型</th>
-                            <th className="px-4 py-3 font-medium">作业</th>
-                            <th className="px-4 py-3 font-medium">状态</th>
-                            <th className="px-4 py-3 font-medium">客户/船名</th>
-                            <th className="px-4 py-3 font-medium">堆位</th>
-                            <th className="px-4 py-3 font-medium">时间</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {[
-                            { id: 'MSCU1234567', type: '40\' HC', op: '卸船', load: '重箱', ref: '远洋1号', pos: 'A-03-02', time: '11:20' },
-                            { id: 'COSU7654321', type: '20\' GP', op: '装车', load: '空箱', ref: '顺丰物流', pos: 'B-12-01', time: '10:45' },
-                            { id: 'MAEU9876543', type: '40\' GP', op: '卸车', load: '重箱', ref: '中外运', pos: 'C-05-04', time: '10:15' },
-                            { id: 'EVER2468135', type: '20\' GP', op: '装船', load: '重箱', ref: '长荣海运', pos: 'A-08-03', time: '09:50' },
-                            { id: 'CMAU1357924', type: '40\' HC', op: '卸船', load: '空箱', ref: '达飞轮船', pos: 'D-02-01', time: '09:10' },
-                          ].map((row, i) => (
-                            <tr key={i} className="hover:bg-muted/30">
-                              <td className="px-4 py-3 font-mono font-medium">{row.id}</td>
-                              <td className="px-4 py-3 text-xs">{row.type}</td>
-                              <td className="px-4 py-3">
-                                <span className={cn(
-                                  "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                  row.op.includes('装') ? "bg-blue-50 text-primary" : "bg-green-50 text-success-text"
-                                )}>
-                                  {row.op}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className={cn(
-                                  "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                  row.load === '重箱' ? "bg-slate-100 text-slate-700" : "bg-slate-50 text-slate-400"
-                                )}>
-                                  {row.load}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3">{row.ref}</td>
-                              <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{row.pos}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{row.time}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                 ) : (
-                  <div className="space-y-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">
-                          {viewingReport.includes('库存') ? '当前总库存' : '总吞吐量'}
-                        </p>
-                        <p className="text-xl font-bold mt-1">
-                          {viewingReport.includes('库存') ? '47,100 t' : '12,450 t'}
-                        </p>
-                      </div>
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">
-                          {viewingReport.includes('客户') ? '活跃客户' : '入库车次'}
-                        </p>
-                        <p className="text-xl font-bold mt-1">
-                          {viewingReport.includes('客户') ? '24 家' : '156 次'}
-                        </p>
-                      </div>
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">
-                          {viewingReport.includes('分析') ? '环比增长' : '出库车次'}
-                        </p>
-                        <p className="text-xl font-bold mt-1">
-                          {viewingReport.includes('分析') ? '+8.5 %' : '142 次'}
-                        </p>
-                      </div>
-                      <div className="p-4 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground uppercase">安全运行</p>
-                        <p className="text-xl font-bold mt-1 text-success-text">1,240 天</p>
-                      </div>
-                    </div>
-
-                    <div className="border border-border rounded-xl overflow-hidden">
-                      <table className="w-full text-sm text-left">
-                        <thead className="bg-muted">
-                          <tr>
-                            <th className="px-4 py-3 font-medium">
-                              {viewingReport.includes('库存') ? '库位编号' : '时间'}
-                            </th>
-                            <th className="px-4 py-3 font-medium">
-                              {viewingReport.includes('客户') ? '客户名称' : '货物品类'}
-                            </th>
-                            <th className="px-4 py-3 font-medium">
-                              {viewingReport.includes('库存') ? '存放品类' : '作业类型'}
-                            </th>
-                            <th className="px-4 py-3 font-medium">数量 (t)</th>
-                            <th className="px-4 py-3 font-medium">状态</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {viewingReport.includes('库存') ? (
-                            [
-                              { id: 'W001-E', cargo: '煤炭', type: '东区', amount: '12,500', status: '正常' },
-                              { id: 'W001-W', cargo: '煤炭', type: '西区', amount: '8,400', status: '正常' },
-                              { id: 'W002-E', cargo: '铝矾土', type: '东区', amount: '15,000', status: '预警' },
-                              { id: 'W002-W', cargo: '铝矾土', type: '西区', amount: '11,200', status: '正常' },
-                            ].map((row, i) => (
-                              <tr key={i} className="hover:bg-muted/30">
-                                <td className="px-4 py-3 text-muted-foreground font-mono">{row.id}</td>
-                                <td className="px-4 py-3 font-medium">-- 多客户汇总 --</td>
-                                <td className="px-4 py-3">{row.cargo}</td>
-                                <td className="px-4 py-3 font-mono">{row.amount}</td>
-                                <td className="px-4 py-3">
-                                  <div className="flex items-center gap-1.5">
-                                    <div className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      row.status === '正常' ? "bg-success-text" : "bg-risk-red-text"
-                                    )} />
-                                    {row.status}
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            [
-                              { time: '08:30', cargo: '煤炭', type: '入库', amount: '450', status: '已完成' },
-                              { time: '08:45', cargo: '铝矾土', type: '出库', amount: '320', status: '进行中' },
-                              { time: '09:15', cargo: '煤炭', type: '入库', amount: '580', status: '已完成' },
-                              { time: '09:30', cargo: '铝矾土', type: '入库', amount: '210', status: '待处理' },
-                              { time: '10:00', cargo: '煤炭', type: '出库', amount: '640', status: '已完成' },
-                            ].map((row, i) => (
-                              <tr key={i} className="hover:bg-muted/30">
-                                <td className="px-4 py-3 text-muted-foreground">{row.time}</td>
-                                <td className="px-4 py-3 font-medium">{row.cargo}</td>
-                                <td className="px-4 py-3">
-                                  <span className={cn(
-                                    "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                                    row.type === '入库' ? "bg-blue-50 text-primary" : "bg-orange-50 text-risk-orange-text"
-                                  )}>
-                                    {row.type}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3 font-mono">{row.amount}</td>
-                                <td className="px-4 py-3">
-                                  <div className="flex items-center gap-1.5">
-                                    <div className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      row.status === '已完成' ? "bg-success-text" : row.status === '进行中' ? "bg-primary" : "bg-muted-foreground"
-                                    )} />
-                                    {row.status}
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <FileText size={48} className="mb-4 opacity-50" />
+                    <p>报表内容预览功能开发中...</p>
+                    <p className="text-sm mt-2">请导出后查看完整内容</p>
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="p-6 border-t border-border bg-muted/10 flex justify-end gap-3">
-              <button 
-                onClick={() => setViewingReport(null)}
-                className="px-6 py-2 border border-border rounded-full text-sm font-medium hover:bg-muted transition-colors"
-              >
-                关闭
-              </button>
-              <button 
-                onClick={() => {
-                  handleExport(viewingReport);
-                  setViewingReport(null);
-                }}
-                className="px-6 py-2 bg-primary text-white rounded-full text-sm font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-              >
-                <Download size={18} />
-                立即导出
-              </button>
             </div>
           </div>
         </div>

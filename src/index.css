@@ -1,70 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
-@import "tailwindcss";
+@import '@lark-apaas/client-toolkit/lib/index.css';
+@import "tw-animate-css";
+@import "./tailwind-theme.css";
+@import "./typography.css";
 
-@theme {
-  --font-sans: "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-
-  /* Google Material 3 Light Theme Colors */
-  --color-background: #f8f9fa;
-  --color-foreground: #202124;
-  --color-card: #ffffff;
-  --color-card-foreground: #202124;
-  --color-muted: #f1f3f4;
-  --color-muted-foreground: #5f6368;
-  --color-primary: #1a73e8;
-  --color-primary-foreground: #ffffff;
-  --color-accent: #e8f0fe;
-  --color-accent-foreground: #1a73e8;
-  --color-border: #dadce0;
-  --color-input: #f1f3f4;
-  --color-ring: #1a73e8;
-
-  /* Sidebar */
-  --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #3c4043;
-  --color-sidebar-primary: #e8f0fe;
-  --color-sidebar-primary-foreground: #1a73e8;
-  --color-sidebar-accent: #f1f3f4;
-  --color-sidebar-accent-foreground: #202124;
-  --color-sidebar-border: #dadce0;
-  --color-sidebar-ring: #1a73e8;
-
-  /* Safety Semantic Colors (Google-like) */
-  --color-risk-red-bg: #fce8e6;
-  --color-risk-red-text: #d93025;
-  --color-risk-orange-bg: #feefe3;
-  --color-risk-orange-text: #e8710a;
-  --color-risk-yellow-bg: #fef7e0;
-  --color-risk-yellow-text: #f9ab00;
-  --color-risk-blue-bg: #e8f0fe;
-  --color-risk-blue-text: #1a73e8;
-  --color-success-bg: #e6f4ea;
-  --color-success-text: #1e8e3e;
-
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-
-  --shadow-google: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-  --shadow-google-hover: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
-}
-
-@layer base {
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-  }
-}
-
-@layer components {
-  .safety-card {
-    @apply bg-card rounded-[16px] border border-border shadow-google overflow-hidden relative transition-shadow duration-200 hover:shadow-google-hover;
-  }
-  
-  .safety-bar-red { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-red-text; }
-  .safety-bar-orange { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-orange-text; }
-  .safety-bar-yellow { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-yellow-text; }
-  .safety-bar-blue { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-risk-blue-text; }
-  .safety-bar-green { @apply before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-success-text; }
-}
+@source "../../node_modules/streamdown/dist/*.js";
+@config "../../tailwind.config.ts";
