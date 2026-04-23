@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "miaoda": {
+      "command": "node",
+      "args": ["./miaoda-mcp/dist/index.js"]
+    },
+    "playwright": {
+      "command": "node",
+      "args": ["/opt/homebrew/lib/node_modules/@playwright/mcp/cli.js"],
+      "env": {
+        "MCP_HEADLESS": "true"
+      }
+    },
+    "chrome-devtools": {
+      "command": "chrome-devtools-mcp",
+      "args": ["--browserUrl", "http://127.0.0.1:9222"]
+    }
+  }
+}

@@ -10,7 +10,8 @@ import {
   X,
   LogOut,
   Warehouse,
-  Database
+  Database,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +28,7 @@ const menuItems = [
   { id: 'hazards', label: '隐患治理', icon: ClipboardCheck },
   { id: 'equipment', label: '设备管理', icon: HardHat },
   { id: 'statistics', label: '统计分析', icon: BarChart3 },
+  { id: 'daily-report', label: '日报管理', icon: FileText },
   { id: 'settings', label: '系统设置', icon: Settings },
 ];
 

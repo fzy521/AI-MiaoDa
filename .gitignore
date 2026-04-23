@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+tsconfig.tsbuildinfo
+.playwright-mcp/
+*.jpg
+*.png
+miaoda_snapshot.yaml
