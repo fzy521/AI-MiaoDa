@@ -10,6 +10,7 @@ import { writeCodeSchema, handleWriteCode } from "./tools/write-code.js";
 import { listFilesSchema, handleListFiles } from "./tools/list-files.js";
 import { screenshotSchema, handleScreenshot } from "./tools/screenshot.js";
 import { setEditorSchema, handleSetEditor } from "./tools/set-editor.js";
+import { diagnoseSchema, handleDiagnose } from "./tools/diagnose.js";
 
 const server = new McpServer({
   name: "miaoda",
@@ -63,6 +64,13 @@ server.tool(
   "Set the project editor URL. The browser will auto-navigate to this page on subsequent operations.",
   setEditorSchema,
   async (args) => handleSetEditor(args as any)
+);
+
+server.tool(
+  "miaoda_diagnose",
+  "Run Monaco API diagnostics to understand the editor environment.",
+  diagnoseSchema,
+  async () => handleDiagnose()
 );
 
 async function main() {

@@ -9,6 +9,13 @@ export interface KPI {
   level?: RiskLevel | 'SUCCESS';
 }
 
+export interface StatusChange {
+  status: HazardStatus;
+  date: string;
+  note?: string;
+  reviewer?: string;
+}
+
 export interface Hazard {
   id: string;
   title: string;
@@ -25,6 +32,7 @@ export interface Hazard {
   reviewer?: string;
   reviewNote?: string;
   reviewedAt?: string;
+  statusLog: StatusChange[];
 }
 
 export interface HazardMonthlyStats {

@@ -126,7 +126,7 @@ async function collapseChatPanel(): Promise<void> {
 
 // Click the </> code button on the Miaoda page to enter code editor mode
 // Skips if already in code view (avoids toggle-back to preview)
-async function clickCodeButton(): Promise<boolean> {
+export async function clickCodeButton(): Promise<boolean> {
   if (!page) return false;
 
   try {
@@ -211,6 +211,33 @@ async function waitForEditorReady(timeoutMs = EDITOR_READY_TIMEOUT): Promise<boo
   } catch {
     return false;
   }
+}
+
+// --- Workbench Frame Management ---
+
+// Find the VS Code workbench iframe (the aiforce.run frame) regardless of Monaco state
+let workbenchFrameUrl: string | null = null;
+
+export async function getWorkbenchFrame(page: Page): Promise<Frame | null> {
+  // Use cached URL if available
+  if (workbenchFrameUrl) {
+    const cachedFrame = page.frames().find(f => f.url().includes(workbenchFrameUrl!));
+    if (cachedFrame) return cachedFrame;
+    workbenchFrameUrl = null;
+  }
+
+  // Find the frame that looks like the VS Code workbench
+  const frames = page.frames();
+  for (const frame of frames) {
+    const url = frame.url();
+    // Workbench iframe is on aiforce.run and has the app path
+    if (url.includes("aiforce.run") && url.includes("/app/")) {
+      workbenchFrameUrl = url.split("?")[0]; // Cache without query params
+      return frame;
+    }
+  }
+
+  return null;
 }
 
 // --- Monaco Frame Management ---
@@ -301,44 +328,58 @@ export async function openFileInEditor(filePath: string): Promise<{ success: boo
   const { page } = await getOrLaunch();
 
   try {
-    const frame = await getMonacoFrame(page);
-    if (!frame) {
-      return { success: false, error: "Monaco frame not found" };
-    }
+    // File tree is in the MAIN page DOM, not in an iframe.
+    // Use page.evaluate() directly for all file tree operations.
 
-    // Click Explorer icon inside the Monaco frame
-    await frame.evaluate(() => {
+    // Click Explorer icon to ensure file tree is visible
+    await page.evaluate(() => {
       const explorerIcon = document.querySelector('.activitybarleft .action-label[title*="Explorer"], .activitybarleft .action-label[title*="资源管理器"]');
       if (explorerIcon) (explorerIcon as HTMLElement).click();
     }).catch(() => {});
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
     const segments = filePath.split("/").filter(Boolean);
     const fileName = segments.pop()!;
 
+    // Expand directories in the file tree using page-level evaluate
     for (const dir of segments) {
-      const expanded = await expandDirectory(frame, dir);
+      const expanded = await expandDirectoryInPage(page, dir);
       if (!expanded) {
-        return { success: false, error: `Cannot expand directory: ${dir}` };
+        await scrollTreeToFindInPage(page, dir);
+        const retryExpanded = await expandDirectoryInPage(page, dir);
+        if (!retryExpanded) {
+          return { success: false, error: `Cannot expand directory: ${dir}` };
+        }
       }
       await page.waitForTimeout(500);
     }
 
-    const clicked = await clickTreeItem(frame, fileName);
+    // Click the file to open it
+    const clicked = await clickTreeItemInPage(page, fileName);
     if (clicked) {
-      await page.waitForTimeout(800);
+      await page.waitForSelector(".monaco-editor", { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1000);
       return { success: true };
     }
 
-    // Fallback: JS click via aria-label inside the frame
-    const ariaClicked = await frame.evaluate((name: string) => {
+    // Fallback: scroll through tree
+    const scrollClicked = await scrollTreeToFindAndClickInPage(page, fileName);
+    if (scrollClicked) {
+      await page.waitForSelector(".monaco-editor", { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1000);
+      return { success: true };
+    }
+
+    // Final fallback: aria-label click
+    const ariaClicked = await page.evaluate((name: string) => {
       const item = document.querySelector(`[aria-label*="${name}"]`);
       if (item) { (item as HTMLElement).click(); return true; }
       return false;
     }, fileName).catch(() => false);
 
     if (ariaClicked) {
-      await page.waitForTimeout(800);
+      await page.waitForSelector(".monaco-editor", { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1000);
       return { success: true };
     }
 
@@ -348,21 +389,101 @@ export async function openFileInEditor(filePath: string): Promise<{ success: boo
   }
 }
 
-async function expandDirectory(frame: Frame, dirName: string): Promise<boolean> {
-  // Use JS to find and click inside the Monaco frame
-  const result = await frame.evaluate((targetDir: string) => {
+// --- Page-level file tree operations (file tree is in main page DOM) ---
+
+async function expandDirectoryInPage(page: Page, dirName: string): Promise<boolean> {
+  const result = await page.evaluate((targetDir: string) => {
     const treeRows = document.querySelectorAll(".monaco-list-row");
     for (const row of treeRows) {
-      const text = row.textContent?.trim();
-      if (text === targetDir || text?.includes(targetDir)) {
+      const label = row.querySelector(".monaco-highlighted-label, .label-name");
+      const text = label?.textContent?.trim() || row.textContent?.trim()?.split("\n")[0];
+      if (text === targetDir || text?.startsWith(targetDir)) {
         const twistie = row.querySelector(".monaco-tl-twistie");
         if (twistie) {
           const cls = twistie.getAttribute("class") || "";
           if (cls.includes("collapsed")) {
             (twistie as HTMLElement).click();
-            return true;
           }
-          return true; // already expanded
+          return true;
+        }
+        (row as HTMLElement).click();
+        return true;
+      }
+    }
+    return false;
+  }, dirName);
+  return result;
+}
+
+async function clickTreeItemInPage(page: Page, itemName: string): Promise<boolean> {
+  const result = await page.evaluate((name: string) => {
+    const treeRows = document.querySelectorAll(".monaco-list-row");
+    for (const row of treeRows) {
+      const label = row.querySelector(".monaco-highlighted-label, .label-name");
+      if (label) {
+        const text = label.textContent?.trim();
+        if (text === name) {
+          (row as HTMLElement).click();
+          return true;
+        }
+      }
+    }
+    return false;
+  }, itemName);
+  return result;
+}
+
+async function scrollTreeToFindInPage(page: Page, dirName: string): Promise<boolean> {
+  return page.evaluate((name: string) => {
+    const treeContainer = document.querySelector('.explorer-viewlet .monaco-scrollable-element, .monaco-tree .monaco-scrollable-element, .monaco-scrollable-element');
+    if (!treeContainer) return false;
+    for (let i = 0; i < 20; i++) {
+      (treeContainer as HTMLElement).scrollTop += (treeContainer as HTMLElement).clientHeight * 0.8;
+      const rows = document.querySelectorAll(".monaco-list-row");
+      for (const row of rows) {
+        const text = row.textContent?.trim()?.split("\n")[0];
+        if (text === name) return true;
+      }
+    }
+    return false;
+  }, dirName);
+}
+
+async function scrollTreeToFindAndClickInPage(page: Page, itemName: string): Promise<boolean> {
+  return page.evaluate((name: string) => {
+    const treeContainer = document.querySelector('.explorer-viewlet .monaco-scrollable-element, .monaco-tree .monaco-scrollable-element, .monaco-scrollable-element');
+    if (!treeContainer) return false;
+    for (let i = 0; i < 20; i++) {
+      (treeContainer as HTMLElement).scrollTop += (treeContainer as HTMLElement).clientHeight * 0.8;
+      const rows = document.querySelectorAll(".monaco-list-row");
+      for (const row of rows) {
+        const label = row.querySelector(".monaco-highlighted-label, .label-name");
+        if (label && label.textContent?.trim() === name) {
+          (row as HTMLElement).click();
+          return true;
+        }
+      }
+    }
+    return false;
+  }, itemName);
+}
+
+// --- Frame-level file tree operations (kept for backward compatibility) ---
+
+async function expandDirectory(frame: Frame, dirName: string): Promise<boolean> {
+  const result = await frame.evaluate((targetDir: string) => {
+    const treeRows = document.querySelectorAll(".monaco-list-row");
+    for (const row of treeRows) {
+      const label = row.querySelector(".monaco-highlighted-label, .label-name");
+      const text = label?.textContent?.trim() || row.textContent?.trim()?.split("\n")[0];
+      if (text === targetDir || text?.startsWith(targetDir)) {
+        const twistie = row.querySelector(".monaco-tl-twistie");
+        if (twistie) {
+          const cls = twistie.getAttribute("class") || "";
+          if (cls.includes("collapsed")) {
+            (twistie as HTMLElement).click();
+          }
+          return true;
         }
         (row as HTMLElement).click();
         return true;
@@ -375,11 +496,10 @@ async function expandDirectory(frame: Frame, dirName: string): Promise<boolean> 
 }
 
 async function clickTreeItem(frame: Frame, itemName: string): Promise<boolean> {
-  // Use JS click inside the Monaco frame
   const result = await frame.evaluate((name: string) => {
     const treeRows = document.querySelectorAll(".monaco-list-row");
     for (const row of treeRows) {
-      const label = row.querySelector(".monaco-highlighted-label");
+      const label = row.querySelector(".monaco-highlighted-label, .label-name");
       if (label) {
         const text = label.textContent?.trim();
         if (text === name) {
@@ -391,19 +511,34 @@ async function clickTreeItem(frame: Frame, itemName: string): Promise<boolean> {
     return false;
   }, itemName);
 
-  if (result) return true;
+  return result;
+}
 
-  // Scroll through tree to find item inside the Monaco frame
-  const scrollResult = await frame.evaluate((name: string) => {
-    const treeContainer = document.querySelector('.explorer-viewlet .monaco-scrollable-element, .monaco-tree .monaco-scrollable-element');
+async function scrollTreeToFind(frame: Frame, dirName: string): Promise<boolean> {
+  return frame.evaluate((name: string) => {
+    const treeContainer = document.querySelector('.explorer-viewlet .monaco-scrollable-element, .monaco-tree .monaco-scrollable-element, .monaco-scrollable-element');
     if (!treeContainer) return false;
-
     for (let i = 0; i < 20; i++) {
       (treeContainer as HTMLElement).scrollTop += (treeContainer as HTMLElement).clientHeight * 0.8;
-
       const rows = document.querySelectorAll(".monaco-list-row");
       for (const row of rows) {
-        const label = row.querySelector(".monaco-highlighted-label");
+        const text = row.textContent?.trim()?.split("\n")[0];
+        if (text === name) return true;
+      }
+    }
+    return false;
+  }, dirName);
+}
+
+async function scrollTreeToFindAndClick(frame: Frame, itemName: string): Promise<boolean> {
+  return frame.evaluate((name: string) => {
+    const treeContainer = document.querySelector('.explorer-viewlet .monaco-scrollable-element, .monaco-tree .monaco-scrollable-element, .monaco-scrollable-element');
+    if (!treeContainer) return false;
+    for (let i = 0; i < 20; i++) {
+      (treeContainer as HTMLElement).scrollTop += (treeContainer as HTMLElement).clientHeight * 0.8;
+      const rows = document.querySelectorAll(".monaco-list-row");
+      for (const row of rows) {
+        const label = row.querySelector(".monaco-highlighted-label, .label-name");
         if (label && label.textContent?.trim() === name) {
           (row as HTMLElement).click();
           return true;
@@ -412,8 +547,6 @@ async function clickTreeItem(frame: Frame, itemName: string): Promise<boolean> {
     }
     return false;
   }, itemName);
-
-  return scrollResult;
 }
 
 export { MIAODA_URL };

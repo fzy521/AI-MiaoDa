@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { useHazardStore } from '@/stores/useHazardStore';
+import { useHazardStore, getStatusAtMonth } from '@/stores/useHazardStore';
 import type { HazardStatus, RiskLevel } from '@/types';
 import {
   ChevronLeft,
@@ -58,16 +58,16 @@ export function HazardMonthlyReport() {
   const [statusFilter, setStatusFilter] = React.useState<HazardStatus | 'ALL'>('ALL');
   const [levelFilter, setLevelFilter] = React.useState<RiskLevel | 'ALL'>('ALL');
 
-  const { getByMonth, getMonthlyStats, getMonthlyTrend } = useHazardStore();
+  const { getLedger, getMonthlyStats, getMonthlyTrend } = useHazardStore();
   const monthStr = `${year}-${String(month).padStart(2, '0')}`;
   const stats = React.useMemo(() => getMonthlyStats(monthStr), [monthStr, getMonthlyStats]);
   const trend = React.useMemo(() => getMonthlyTrend(6), [getMonthlyTrend]);
   const hazards = React.useMemo(() => {
-    let list = getByMonth(monthStr);
-    if (statusFilter !== 'ALL') list = list.filter(h => h.status === statusFilter);
+    let list = getLedger(year, month);
+    if (statusFilter !== 'ALL') list = list.filter(h => getStatusAtMonth(h, year, month).status === statusFilter);
     if (levelFilter !== 'ALL') list = list.filter(h => h.level === levelFilter);
     return list;
-  }, [monthStr, statusFilter, levelFilter, getByMonth]);
+  }, [year, month, statusFilter, levelFilter, getLedger]);
 
   const prevMonth = () => {
     if (month === 1) { setYear(y => y - 1); setMonth(12); }
@@ -310,7 +310,9 @@ export function HazardMonthlyReport() {
                   </td>
                 </tr>
               ) : (
-                hazards.map(h => (
+                hazards.map(h => {
+                  const { status: monthStatus, reviewer: monthReviewer } = getStatusAtMonth(h, year, month);
+                  return (
                   <tr key={h.id} className="hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{h.id}</td>
                     <td className="px-4 py-3 max-w-[240px]">
@@ -330,15 +332,15 @@ export function HazardMonthlyReport() {
                     <td className="px-4 py-3 text-center">
                       <span className={cn(
                         'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
-                        STATUS_CONFIG[h.status].cls
+                        STATUS_CONFIG[monthStatus].cls
                       )}>
-                        {React.createElement(STATUS_CONFIG[h.status].icon, { size: 12 })}
-                        {STATUS_CONFIG[h.status].label}
+                        {React.createElement(STATUS_CONFIG[monthStatus].icon, { size: 12 })}
+                        {STATUS_CONFIG[monthStatus].label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center">{h.reviewer || '-'}</td>
+                    <td className="px-4 py-3 text-center">{monthReviewer || '-'}</td>
                   </tr>
-                ))
+                );})
               )}
             </tbody>
           </table>
