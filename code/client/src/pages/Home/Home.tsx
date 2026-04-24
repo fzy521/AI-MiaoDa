@@ -2,9 +2,13 @@ import React from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Dashboard } from '@/components/Dashboard';
 import { HazardManagement } from '@/components/HazardManagement';
+import { HazardMonthlyReport } from '@/components/HazardMonthlyReport';
+import { RiskManagement } from '@/components/RiskManagement';
 import { WMS } from '@/components/WMS';
 import { Statistics } from '@/components/Statistics';
 import { BasicInfo } from '@/components/BasicInfo';
+import { DailyReport } from '@/components/DailyReport';
+import { Settings } from '@/components/Settings';
 import { Bell, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,12 +21,20 @@ export default function Home() {
         return <Dashboard />;
       case 'hazards':
         return <HazardManagement />;
+      case 'hazard-monthly':
+        return <HazardMonthlyReport />;
+      case 'risks':
+        return <RiskManagement />;
       case 'wms':
         return <WMS />;
       case 'basic':
         return <BasicInfo />;
       case 'statistics':
         return <Statistics />;
+      case 'daily-report':
+        return <DailyReport />;
+      case 'settings':
+        return <Settings />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground">
@@ -39,16 +51,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background font-sans">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      
+
       <div className="lg:pl-64 flex flex-col min-h-screen">
         {/* Topbar */}
         <header className="sticky top-0 z-30 h-16 bg-background flex items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-4 flex-1">
             <div className="relative hidden md:block w-full max-w-2xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-              <input 
-                type="text" 
-                placeholder="快速搜索风险点、设备、隐患..." 
+              <input
+                type="text"
+                placeholder="快速搜索风险点、设备、隐患..."
                 className="w-full pl-12 pr-4 py-3 bg-white border border-border rounded-full text-sm focus:bg-white focus:border-primary focus:shadow-md transition-all outline-none"
               />
             </div>

@@ -9,6 +9,13 @@ export interface KPI {
   level?: RiskLevel | 'SUCCESS';
 }
 
+export interface StatusChange {
+  status: HazardStatus;
+  date: string;
+  note?: string;
+  reviewer?: string;
+}
+
 export interface Hazard {
   id: string;
   title: string;
@@ -18,6 +25,26 @@ export interface Hazard {
   reporter: string;
   date: string;
   location: string;
+  assignee?: string;
+  department?: string;
+  deadline?: string;
+  rectifyNote?: string;
+  reviewer?: string;
+  reviewNote?: string;
+  reviewedAt?: string;
+  statusLog?: StatusChange[];
+}
+
+export interface HazardMonthlyStats {
+  month: string;
+  totalNew: number;
+  totalClosed: number;
+  totalPending: number;
+  totalRectifying: number;
+  totalReviewing: number;
+  byLevel: Record<RiskLevel, number>;
+  closureRate: number;
+  avgRectifyDays: number;
 }
 
 export interface RiskPoint {
@@ -27,6 +54,14 @@ export interface RiskPoint {
   department: string;
   lastInspection: string;
   status: 'NORMAL' | 'ABNORMAL';
+  // Extended fields
+  type?: '人' | '机' | '环' | '管';
+  workActivity?: string;
+  hazard?: string;
+  accidentType?: string;
+  controlMeasures?: string;
+  area?: string;
+  assignee?: string;
 }
 
 // WMS Types
@@ -34,43 +69,43 @@ export type CargoType = 'COAL' | 'BAUXITE';
 
 export interface CoalEntry {
   id: string;
-  trainNo: string;      // 车号
-  originStation: string; // 发站
-  weight: number;       // 重量
-  customer: string;     // 客户
+  trainNo: string;
+  originStation: string;
+  weight: number;
+  customer: string;
   area: 'EAST' | 'WEST';
-  startPosition: number; // 起始位置 (米)
-  endPosition: number;   // 结束位置 (米)
+  startPosition: number;
+  endPosition: number;
   timestamp: string;
 }
 
 export interface BauxiteEntry {
   id: string;
-  shipName: string;     // 船名
-  customer: string;     // 客户
-  weight: number;       // 重量
+  shipName: string;
+  customer: string;
+  weight: number;
   area: 'EAST' | 'WEST';
-  occupiedArea: number; // 占用面积 (平米)
+  occupiedArea: number;
   timestamp: string;
 }
 
 export interface CoalOutflow {
   id: string;
-  sourceEntryId: string; // 关联的入库记录ID (货位)
-  trainNo: string;      // 车号
-  destinationStation: string; // 到站
-  weight: number;       // 重量
-  customer: string;     // 客户
+  sourceEntryId: string;
+  trainNo: string;
+  destinationStation: string;
+  weight: number;
+  customer: string;
   area: 'EAST' | 'WEST';
   timestamp: string;
 }
 
 export interface BauxiteOutflow {
   id: string;
-  sourceEntryId: string; // 关联的入库记录ID (货位)
-  shipName: string;     // 船名
-  customer: string;     // 客户
-  weight: number;       // 重量
+  sourceEntryId: string;
+  shipName: string;
+  customer: string;
+  weight: number;
   area: 'EAST' | 'WEST';
   timestamp: string;
 }
